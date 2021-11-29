@@ -60,17 +60,11 @@ How to save your data internally
   * row-level locking
   * multi-versioning
 
+## Internally 
 
+  * indexes refer to the data through primary keys
+  * indexes can quickly get huge in size
+    * if size of primary index is not small
+  * InnoDB puts Data in Buffer Pool
+  * The Buffer Pool is in memory
 
-indexes refer to the data through primary keys
-indexes can quickly get huge in size
-→ if size of primary index is not small
-Caching/Indexes
-optimized caching:
-InnoDB puts Data in Buffer Pool
-The Buffer Pool is in memory
-Builds hash-indexes to speed up row retrieval
-unpacked indexes
-indexes are not compressed
-because of that →
-bigger than in MySQL
