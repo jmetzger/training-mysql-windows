@@ -1,3 +1,3 @@
 # MySQL Architecture 
 
-![MySQL Architecture](/images/mysql-architecture.png)
+![MySQL Architecture](/images/mysql-architecture.jpg)
