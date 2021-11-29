@@ -1,4 +1,4 @@
-# Globale und Session Variablen 
+# Globale/Persistente und Session Variablen 
 
 ## Find out with show and @@ 
 
@@ -70,8 +70,19 @@ mysql>
 
 ```
 
+## SET PERSISTENT 
 
-## Get directly from performance_schema (starting from MySQL 8) 
+```
+# Set variable to be use also after restart of mysql-server 
+SET PERSIST long_query_time = 0.000001
+
+# will we in 
+C:\ProgramData\MySQL\MySQL Server 8.0\Data\mysql-auto.cnf 
+# <- as json 
+# loaded after my.ini 
+```
+
+## Get GLOBAL/SESSION variable directly from performance_schema (starting from MySQL 8) 
 
 ```
 use performance_schema 
