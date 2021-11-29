@@ -1,5 +1,7 @@
 # Globale und Session Variablen 
 
+## Find out with show and @@ 
+
 ```
 mysql> show session variables like 'PERFORMANCE%schema';
 +--------------------+-------+
@@ -65,5 +67,20 @@ mysql> select @@GLOBAL.long_query_time;
 
 mysql> 
 
+
+```
+
+
+## Get directly from performance_schema (starting from MySQL 8) 
+
+```
+use performance_schema 
+select * from global_variables;
+select * from session_variables 
+
+# or Alternative is (without use):
+use sakila;
+select * from performance_schema.global_variables
+select * from performance_schema.session_variables
 
 ```
