@@ -6,7 +6,7 @@
 
 # 1. Download installer 
 
-# 2. Run Default installation to C: (with service) 
+# 2. Run Default installation to C: (with service) without installing service 
 
 # 3. Move installation directory to new destination (e.g. D:\
 
