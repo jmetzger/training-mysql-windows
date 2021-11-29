@@ -1,28 +1,18 @@
-# Starten,stopppen und aktivieren von MySQL
+# Starten,stoppen und aktivieren von MySQL
 
-## start/stop/status 
-
-```
-# als root - Benutzer
-systemctl status mysql
-systemctl stop mysql 
-systemctl start mysql 
-```
-
-## Aktivieren/Deaktivieren (enable/disable) 
+## starten /stoppen 
 
 ```
-# Automatischen Starten nach dem Booten (enable) 
-systemctl enable mysql 
+cmd.exe als Administratoren ausführen (Rechte Maustaste) 
+net start MySQL80 
+# stoppen 
+net stop MYSQL80 
 
-# is dienst aktiviert 
-systemctl is-enabled mysql
+```
 
-# deaktivieren
-systemctl disable mysql 
-systemctl is-enabled mysql 
+## Alternativ -> Dienste 
 
-# systemctl status -> Zeile disabled/enabled 
-
-
+```
+Dienste ->
+und in der Liste MySQL80 -> Rechte Maustaste
 ```
