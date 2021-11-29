@@ -2,7 +2,8 @@
 
 ## Agenda 
 
-  1. Architektur von MySQL 
+  1. Architecture of MySQL 
+     * [MySQL Architectur](mysql-architecture.md)
      * [Verarbeitungsschritte Server (Schritte)](/performance/mysql-server-architecture.md)
      * [InnoDB Struktur](innodb/innodb-structure.md)
      * [Storage Engines](/basics/storage-engines.md)
