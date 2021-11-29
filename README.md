@@ -8,6 +8,7 @@
      * [InnoDB Struktur](innodb/innodb-structure.md)
      * [Storage Engines](/basics/storage-engines.md)
      * [Unterschiede MySQL 5.7 -> 8](differences-mysql-5-7-to-8.md) 
+     * [Ort Datenverzeichnis Windows](datadir-windows.md)
 
   1. Installation 
      * [MySQL auf andere Platte installieren](mysql-d-disk.md)
