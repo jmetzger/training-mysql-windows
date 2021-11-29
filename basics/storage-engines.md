@@ -1,71 +1,76 @@
 # Storage Engines 
 
-## Warum ?
+## Why ?
 
 ```
-Du triffst die Auswahl:
-Wie sollen Deine Daten gespeichert werden
+Decide:
+How to save your data internally 
 ```
 
-## Wie unterscheiden sich die Storage Engines ?
+## What do they do ?
 
-  * In der Performance, Features und anderen Charakteristiken, die Du brauchst 
+  * In charge for: Responsible for storing and retrieving all data stored in MySQL
+  * Each storage engine has its:
+    * Drawbacks and benefits
+  * Server communicates with them through the storage engine API
+    * this interface hides differences
+    * makes them largely transparent at query layer
+    * api contains a couple of dozen low-level functions
+      * e.g. “begin a transaction”,
+      * “fetch the row that has this primary key”
 
-## Was machen Sie ?
+## What do they not do ?
 
-  * Sie sind zuständig für: Speichern und Lesen aller in MySQL Daten 
-  * Jede Storage Engine hat:
-    * Vor- und Nachteile  
-  * Der Server kommuniziert mit den Storage Engines über die storage engine API 
-    * Unterschiede kann ich durch das Interface nicht sehen.
-    * Die api enthält mehrere Dutzend low-level Funktionen z.B. “Beginne eine Transkation”, “Hole die Zeilen, die diesen Primärschlüssel hat”
+  * Storage Engines do not parse SQL
+  * Storage Engines do not communicate with each other
+  * They simply .....
+    * They simply respond to requests from the server
 
-## Storage Engine machen folgendes NICHT ....
 
-  * Storage Engines parsen kein SQL
-  * Storage Engines kommunizieren nicht miteinander.
-
-## Welches sind die Wichtigsten ?
+## Which are the most important one ?
 
   * MyISAM
-  * InnoDB (Default) 
+  * InnoDB
   * Memory
   * CSV
   * Blackhole (/dev/null)
   * Archive
-  * Federated
+  * Partition 
+  * (Federated)
 
 ## In Detail: MyISAM - Storage Engine
 
-```
-Feautures/Vorteile/Nachteile 
-
-Tabellen-Locks auf Tabellenebene.
-Kein automatisches Data-Recovery
-Daten z.B. bei Stromausfall können verloren (bis zu 8 Sekunden)
-Kein Transaktionen 
-Indizes werden im Arbeitsspeicher vorgehalten
-
-Vorteil: 
-Kompakte Datenspeicherung 
-Table Scans sind sehr schnell
-```
+   * table locks
+     * Locks are done table-wide
+   * no automatic data-recovery
+     * you can loose more data on crashes than with e.g. InnoDB
+     * you can loose up to 8 seconds of data 
+   * no transactions
+   * only indices are saved in memory through MySQL
+   * compact saving (data is saved really dense)
+   * table scans are quick
 
 ## In Detail: InnoDB - Storage Engine
 
-```
-Features
+### Features
+    
+  * support hot backups (because of transactions)
+  * transactions are supported
+  * foreign keys are supported
+  * row-level locking
+  * multi-versioning
 
-Unterstützt hot backups (wg. Transaktionen)
-Transaktionen werden unterstüzt
-Foreign Keys werden unterstützt
-row-level locking
-multi-versioning
 
-indexes referenzieren die Daten über Primärschlüssel 
+
+indexes refer to the data through primary keys
 indexes can quickly get huge in size
 → if size of primary index is not small
-
-Sehr effektives Handling von Daten im Arbeitsspeicher 
-
-```
+Caching/Indexes
+optimized caching:
+InnoDB puts Data in Buffer Pool
+The Buffer Pool is in memory
+Builds hash-indexes to speed up row retrieval
+unpacked indexes
+indexes are not compressed
+because of that →
+bigger than in MySQL
