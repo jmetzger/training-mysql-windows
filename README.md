@@ -19,7 +19,8 @@
      * [Konfiguration anpassen und neu starten]()
 
   1. Datenbank - Objekte 
-     * [Datenbanken](database-objects/databases.md)
+     * [Databases](database-objects/databases.md)
+     * [Tables](database-objects/tables.md)
 
   1. Administration 
      * [Globale und Session Variablen (Server System Variables)](/admin/global-session-variables.md)
