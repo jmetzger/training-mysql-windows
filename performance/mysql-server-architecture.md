@@ -6,4 +6,4 @@
 
 ## Changes in MySQL 8  
 
-  * Query Cache gibt's nicht mehr. 
+  * There is no query cache 
