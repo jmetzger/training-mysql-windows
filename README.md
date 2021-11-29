@@ -10,7 +10,7 @@
      * [Unterschiede MySQL 5.7 -> 8](differences-mysql-5-7-to-8.md) 
 
   1. Installation 
-     * [Installation (Ubuntu)](installation-ubuntu.md)
+     * [MySQL auf andere Platte installieren](mysql-d-disk.md)
      * [Start/Status/Stop/Enable von MySQL](start-stop-enable.md)
      * [Lauscht mysql nach draussen ?](/installation/listening-where.md)
 
