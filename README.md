@@ -66,6 +66,7 @@
 
   1. Tipps & Tricks 
      * [Version von MySQL rausfinden](tipps-tricks/mysql-version.md) 
+     * [Show Information_schema within MySQL Workbench](tipps-tricks/mysql-workbench-information_schema)
 
   1. Documentation 
      * [Server System Variables - Reference](https://dev.mysql.com/doc/refman/8.0/en/server-system-variable-reference.html)
