@@ -1,0 +1,5 @@
+# Show information_schema in mysql workbench 
+
+```
+Edit -> Preferences -> SQL Editor and then check the box "Show Metadata and Internal Schemas"
+```
