@@ -1,4 +1,4 @@
-# Training - Grundlagen MySQL Admininstration (deutsch)  
+# Training - Grundlagen MySQL Admininstration (Windows)
 
 ## Agenda 
 
