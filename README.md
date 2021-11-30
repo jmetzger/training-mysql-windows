@@ -24,6 +24,7 @@
 
   1. Administration 
      * [Globale und Session Variablen (Server System Variables)](/admin/global-session-variables.md)
+     * [Global and Session Status](basics/status.md) 
      * [Error-log](/admin/log-error.md)
      * [Slow Query Log](/admin/slow-query-log.md)
      * [MySQL - Client - Tools (most important)](basics/mysql-client-tools.md) 
