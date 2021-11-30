@@ -57,6 +57,7 @@
 
   1. Authentifizierung / User-Management 
      * [Für User altes Password-Verfahren mysql_native_password verwenden in MySQL 8](user/mysql_native_password.md)
+     * [Wildcard-Rechte für Datenbank](user/wildcard-perms-db.md)
      * [Rollen](roles.md)
   
   1. Upgrade 
