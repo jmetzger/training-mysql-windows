@@ -8,25 +8,32 @@
      * [InnoDB Struktur](innodb/innodb-structure.md)
      * [Storage Engines](/basics/storage-engines.md)
      * [Unterschiede MySQL 5.7 -> 8](differences-mysql-5-7-to-8.md) 
+     * [Ort Datenverzeichnis Windows](datadir-windows.md)
 
   1. Installation 
-     * [Installation (Ubuntu)](installation-ubuntu.md)
+     * [MySQL auf andere Platte installieren](mysql-d-disk.md)
      * [Start/Status/Stop/Enable von MySQL](start-stop-enable.md)
      * [Lauscht mysql nach draussen ?](/installation/listening-where.md)
+     * [2. Instanz von MySQL erstellen](/admin/create-new-instance.md)
 
   1. Konfiguration 
      * [Konfiguration anpassen und neu starten]()
 
+  1. Datenbank - Objekte 
+     * [Databases](database-objects/databases.md)
+     * [Tables](database-objects/tables.md)
+
   1. Administration 
      * [Globale und Session Variablen (Server System Variables)](/admin/global-session-variables.md)
+     * [Global and Session Status](basics/status.md) 
      * [Error-log](/admin/log-error.md)
      * [Slow Query Log](/admin/slow-query-log.md)
+     * [MySQL - Client - Tools (most important)](basics/mysql-client-tools.md) 
+     * [Manage max_connections](max-connections.md)
 
   1. Backup
      * [Backup mit mysqldump - best practices](backup-restore/mysqldump.md) 
      * [Backups PIT (Point-In-Time recovery)](backups/pit-recovery.md) 
-     * [Backup mit xtrabackup](backups/xtrabackup.md)
-     * [Backup mit xtrabackup mit Verschlüsselung](backups/xtrabackup-encrypted.md)
      * [Backup und Wiederherstellen in neuer Datenbank](backups/backup-restore-to-new-db.md)
      * [mysqldump mit asynchroner Verschlüsselung](backups/mysqldump-with-encryption.md)
      * [mydumper und myloader](https://github.com/maxbube/mydumper)
@@ -50,6 +57,7 @@
 
   1. Authentifizierung / User-Management 
      * [Für User altes Password-Verfahren mysql_native_password verwenden in MySQL 8](user/mysql_native_password.md)
+     * [Wildcard-Rechte für Datenbank](user/wildcard-perms-db.md)
      * [Rollen](roles.md)
   
   1. Upgrade 
@@ -57,6 +65,12 @@
 
   1. Windows 
      * [Welchen Benutzer für den Service verwenden?](windows/service-which-user.md)
+
+  1. Tipps & Tricks 
+     * [Version von MySQL rausfinden](tipps-tricks/mysql-version.md) 
+     * [Show Information_schema within MySQL Workbench](tipps-tricks/mysql-workbench-information_schema)
+     * [Set path in Windows for User to easily use mysql](tipps-tricks/mysql-path-windows.md)
+     * [Security with outfile mysql](tipps-tricks/security-write-into-outfile.md)
 
   1. Documentation 
      * [Server System Variables - Reference](https://dev.mysql.com/doc/refman/8.0/en/server-system-variable-reference.html)
