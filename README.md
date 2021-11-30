@@ -32,8 +32,6 @@
   1. Backup
      * [Backup mit mysqldump - best practices](backup-restore/mysqldump.md) 
      * [Backups PIT (Point-In-Time recovery)](backups/pit-recovery.md) 
-     * [Backup mit xtrabackup](backups/xtrabackup.md)
-     * [Backup mit xtrabackup mit Verschlüsselung](backups/xtrabackup-encrypted.md)
      * [Backup und Wiederherstellen in neuer Datenbank](backups/backup-restore-to-new-db.md)
      * [mysqldump mit asynchroner Verschlüsselung](backups/mysqldump-with-encryption.md)
      * [mydumper und myloader](https://github.com/maxbube/mydumper)
