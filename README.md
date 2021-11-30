@@ -28,6 +28,7 @@
      * [Error-log](/admin/log-error.md)
      * [Slow Query Log](/admin/slow-query-log.md)
      * [MySQL - Client - Tools (most important)](basics/mysql-client-tools.md) 
+     * [Manage max_connections](max-connections.md)
 
   1. Backup
      * [Backup mit mysqldump - best practices](backup-restore/mysqldump.md) 
