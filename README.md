@@ -14,6 +14,7 @@
      * [MySQL auf andere Platte installieren](mysql-d-disk.md)
      * [Start/Status/Stop/Enable von MySQL](start-stop-enable.md)
      * [Lauscht mysql nach draussen ?](/installation/listening-where.md)
+     * [2. Instanz von MySQL erstellen](/admin/create-new-instance.md)
 
   1. Konfiguration 
      * [Konfiguration anpassen und neu starten]()
