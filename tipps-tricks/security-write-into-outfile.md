@@ -24,3 +24,12 @@ mysql>SELECT * from sakila.actor INTO OUTFILE 'C:\\ProgramData\\MySQL\\MySQL Ser
 mysql>SELECT * from sakila.actor INTO OUTFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/actor.txt';
 
 ```
+
+## Alternative 
+
+```
+# -r raw format without table 
+# put -e expression in double quotes " 
+mysql -e "select * from actor;" -uroot -r -p sakila  > test.sql
+
+```
