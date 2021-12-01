@@ -22,6 +22,7 @@
   1. Datenbank - Objekte 
      * [Databases](database-objects/databases.md)
      * [Tables](database-objects/tables.md)
+     * [Events](https://www.mysqltutorial.org/mysql-triggers/working-mysql-scheduled-event/)
 
   1. Administration 
      * [Globale und Session Variablen (Server System Variables)](/admin/global-session-variables.md)
