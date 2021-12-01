@@ -1,4 +1,4 @@
-# mysqldump 
+# mysqldump (MySQL 8) 
 
 ## Useful options for PIT (before MySQL 8.0.27)
 
