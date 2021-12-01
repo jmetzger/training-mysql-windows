@@ -35,6 +35,13 @@ SET DEFAULT ROLE ALL TO roleuser@localhost;
 
 ```
 
+## Revoke a role from a user 
+
+```
+REVOKE mysqldb FROM roleuser@localhost;
+
+```
+
 ## Abgekürzte From 
 
 ```
