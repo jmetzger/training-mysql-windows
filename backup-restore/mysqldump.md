@@ -7,13 +7,13 @@
 
 # on local systems using socket, there are no huge benefits concerning --compress
 # when you dump over the network use it for sure 
-mysqldump --all-databases --single-transaction --master-data=2 --routines --events --flush-logs --compress > /usr/src/all-databases.sql;
+mysqldump -uroot -p --all-databases --single-transaction --master-data=2 --routines --events --flush-logs --compress > /usr/src/all-databases.sql;
 ```
 
 ## Same, but MySQL >= 8.0.27 
 
 ```
-mysqldump --all-databases --single-transaction --source-data=2 --routines --events --flush-logs --compress > /usr/src/all-databases.sql;
+mysqldump -uroot -p --all-databases --single-transaction --source-data=2 --routines --events --flush-logs --compress > /usr/src/all-databases.sql;
 
 ```
 
