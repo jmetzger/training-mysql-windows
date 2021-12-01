@@ -1,14 +1,22 @@
 # mysqldump 
 
-## Useful options for PIT 
+## Useful options for PIT (before MySQL 8.0.27)
 
 ```
 # —quick not needed, because included in —opt which is enabled by default 
 
 # on local systems using socket, there are no huge benefits concerning --compress
 # when you dump over the network use it for sure 
-mysqldump --all-databases --single-transaction --gtid --master-data=2 --routines --events --flush-logs --compress > /usr/src/all-databases.sql;
+mysqldump --all-databases --single-transaction --master-data=2 --routines --events --flush-logs --compress > /usr/src/all-databases.sql;
 ```
+
+## Same, but MySQL >= 8.0.27 
+
+```
+mysqldump --all-databases --single-transaction --source-data=2 --routines --events --flush-logs --compress > /usr/src/all-databases.sql;
+
+```
+
 
 ## With PIT_Recovery you can use --delete-master-logs 
 
