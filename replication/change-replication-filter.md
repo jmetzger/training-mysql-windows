@@ -21,6 +21,14 @@ CHANGE REPLICATION FILTER REPLICATE_DO_DB = (dauerversuche) FOR CHANNEL 'replica
 START REPLICA SQL_THREAD FOR CHANNEL 'replicant-1';
 ```
 
+## Rausnehmen 
+
+```
+STOP REPLICA SQL_THREAD FOR CHANNEL 'replicant-1';
+CHANGE REPLICATION FILTER REPLICATE_DO_DB = () FOR CHANNEL 'replicant-1';
+START REPLICA SQL_THREAD FOR CHANNEL 'replicant-1';
+```
+
 ## Reference 
 
   * https://dev.mysql.com/doc/refman/8.0/en/change-replication-filter.html
