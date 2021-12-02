@@ -13,6 +13,13 @@ CHANGE REPLICATION FILTER REPLICATE_DO_DB = (d1);
 
 ```
 
+## Start and Stop the slave (important) 
+
+```
+STOP REPLICA SQL_THREAD FOR CHANNEL 'replicant-1';
+CHANGE REPLICATION FILTER REPLICATE_DO_DB = (dauerversuche) FOR CHANNEL 'replicant-1';
+START REPLICA SQL_THREAD FOR CHANNEL 'replicant-1';
+```
 
 ## Reference 
 
