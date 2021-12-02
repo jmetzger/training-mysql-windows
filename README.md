@@ -64,6 +64,8 @@
      * [Rollen](roles.md)
 
   1. Replication 
+     * [Overview](replication/overview.md)
+     * [Multi-Source-Replication](replication/multi-source-replication.md)
      * [Binlog format](replication/binlog_format.md)
      * [Change-Replication-Filter](replication/change-replication-filter.md)
   
