@@ -42,8 +42,7 @@
      * [mydumper und myloader](https://github.com/maxbube/mydumper)
    
   1. Sicherheit
-     * [Absichern von Server/Client mit ssl](security/ssl.md) 
-     * [Verschlüsselte Backups mit xtrabackup](backups/xtrabackup-encrypted.md) 
+     * [Absichern von Server/Client mit ssl](security/ssl.md)  
      * [Prüfen ob socket verwendet, bei lokalem System](security/check-socket.md)
      * [mysql_secure_installation - validate plugin aktivieren](security/mysql-secure-installation.md)
      * [general log deaktivieren](/security/disable-general-log.md)
@@ -57,6 +56,9 @@
   
   1. Tools 
      * [Testdatenbank Sakila installieren](tools/sakila.md)  
+
+  1. Performance - Analyse 
+     * [Tool pt-query-digest](tools/windows-pt-query-digest.md) 
 
   1. Authentifizierung / User-Management 
      * [Für User altes Password-Verfahren mysql_native_password verwenden in MySQL 8](user/mysql_native_password.md)
