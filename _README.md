@@ -1,31 +1,42 @@
-# Training - Grundlagen MySQL Admininstration (deutsch)  
+# Training - Grundlagen MySQL Admininstration (Windows)
 
 
 ## Agenda
-  1. Architektur von MySQL 
+  1. Architecture of MySQL 
+     * [MySQL Architectur](#mysql-architectur)
      * [Verarbeitungsschritte Server (Schritte)](#verarbeitungsschritte-server-schritte)
      * [InnoDB Struktur](#innodb-struktur)
      * [Storage Engines](#storage-engines)
      * [Unterschiede MySQL 5.7 -> 8](#unterschiede-mysql-5.7-->-8)
+     * [Ort Datenverzeichnis Windows](#ort-datenverzeichnis-windows)
 
   1. Installation 
-     * [Installation (Ubuntu)](#installation-ubuntu)
+     * [MySQL auf andere Platte installieren](#mysql-auf-andere-platte-installieren)
      * [Start/Status/Stop/Enable von MySQL](#startstatusstopenable-von-mysql)
      * [Lauscht mysql nach draussen ?](#lauscht-mysql-nach-draussen-)
+     * [2. Instanz von MySQL erstellen](#2.-instanz-von-mysql-erstellen)
 
   1. Konfiguration 
      * [Konfiguration anpassen und neu starten](#konfiguration-anpassen-und-neu-starten)
 
+  1. Datenbank - Objekte 
+     * [Databases](#databases)
+     * [Tables](#tables)
+     * [Events](https://www.mysqltutorial.org/mysql-triggers/working-mysql-scheduled-event/)
+     * [Views](#views)
+
   1. Administration 
      * [Globale und Session Variablen (Server System Variables)](#globale-und-session-variablen-server-system-variables)
+     * [Global and Session Status](#global-and-session-status)
      * [Error-log](#error-log)
      * [Slow Query Log](#slow-query-log)
+     * [MySQL - Client - Tools (most important)](#mysql---client---tools-most-important)
+     * [Manage max_connections](#manage-max_connections)
 
   1. Backup
      * [Backup mit mysqldump - best practices](#backup-mit-mysqldump---best-practices)
+     * [mysqldump through the air ](#mysqldump-through-the-air-)
      * [Backups PIT (Point-In-Time recovery)](#backups-pit-point-in-time-recovery)
-     * [Backup mit xtrabackup](#backup-mit-xtrabackup)
-     * [Backup mit xtrabackup mit Verschlüsselung](#backup-mit-xtrabackup-mit-verschlüsselung)
      * [Backup und Wiederherstellen in neuer Datenbank](#backup-und-wiederherstellen-in-neuer-datenbank)
      * [mysqldump mit asynchroner Verschlüsselung](#mysqldump-mit-asynchroner-verschlüsselung)
      * [mydumper und myloader](https://github.com/maxbube/mydumper)
@@ -49,13 +60,26 @@
 
   1. Authentifizierung / User-Management 
      * [Für User altes Password-Verfahren mysql_native_password verwenden in MySQL 8](#für-user-altes-password-verfahren-mysql_native_password-verwenden-in-mysql-8)
+     * [Wildcard-Rechte für Datenbank](#wildcard-rechte-für-datenbank)
      * [Rollen](#rollen)
+
+  1. Replication 
+     * [Overview](#overview)
+     * [Multi-Source-Replication](#multi-source-replication)
+     * [Binlog format](#binlog-format)
+     * [Change-Replication-Filter](#change-replication-filter)
   
   1. Upgrade 
      * [Upgrade von MySQL 5.7 -> 8](#upgrade-von-mysql-5.7-->-8)
 
   1. Windows 
      * [Welchen Benutzer für den Service verwenden?](#welchen-benutzer-für-den-service-verwenden)
+
+  1. Tipps & Tricks 
+     * [Version von MySQL rausfinden](#version-von-mysql-rausfinden)
+     * [Show Information_schema within MySQL Workbench](#show-information_schema-within-mysql-workbench)
+     * [Set path in Windows for User to easily use mysql](#set-path-in-windows-for-user-to-easily-use-mysql)
+     * [Security with outfile mysql](#security-with-outfile-mysql)
 
   1. Documentation 
      * [Server System Variables - Reference](https://dev.mysql.com/doc/refman/8.0/en/server-system-variable-reference.html)
@@ -64,7 +88,12 @@
 
 <div class="page-break"></div>
 
-## Architektur von MySQL 
+## Architecture of MySQL 
+
+### MySQL Architectur
+
+
+![MySQL Architecture](/images/mysql-architecture.jpg)
 
 ### Verarbeitungsschritte Server (Schritte)
 
@@ -75,85 +104,90 @@
 
 ### Changes in MySQL 8  
 
-  * Query Cache gibt's nicht mehr. 
+  * There is no query cache 
 
 ### InnoDB Struktur
 
 
+### Overview 
+
 ![InnoDB Structure](/images/InnoDB-Structure.jpg)
+
+### Details 
+
+  * InnoDB Buffer Pool consists of pages of 16Kbytes Size (default) 
 
 ### Storage Engines
 
 
-### Warum ?
+### Why ?
 
 ```
-Du triffst die Auswahl:
-Wie sollen Deine Daten gespeichert werden
+Decide:
+How to save your data internally 
 ```
 
-### Wie unterscheiden sich die Storage Engines ?
+### What do they do ?
 
-  * In der Performance, Features und anderen Charakteristiken, die Du brauchst 
+  * In charge for: Responsible for storing and retrieving all data stored in MySQL
+  * Each storage engine has its:
+    * Drawbacks and benefits
+  * Server communicates with them through the storage engine API
+    * this interface hides differences
+    * makes them largely transparent at query layer
+    * api contains a couple of dozen low-level functions
+      * e.g. “begin a transaction”,
+      * “fetch the row that has this primary key”
 
-### Was machen Sie ?
+### What do they not do ?
 
-  * Sie sind zuständig für: Speichern und Lesen aller in MySQL Daten 
-  * Jede Storage Engine hat:
-    * Vor- und Nachteile  
-  * Der Server kommuniziert mit den Storage Engines über die storage engine API 
-    * Unterschiede kann ich durch das Interface nicht sehen.
-    * Die api enthält mehrere Dutzend low-level Funktionen z.B. “Beginne eine Transkation”, “Hole die Zeilen, die diesen Primärschlüssel hat”
+  * Storage Engines do not parse SQL
+  * Storage Engines do not communicate with each other
+  * They simply .....
+    * They simply respond to requests from the server
 
-### Storage Engine machen folgendes NICHT ....
 
-  * Storage Engines parsen kein SQL
-  * Storage Engines kommunizieren nicht miteinander.
-
-### Welches sind die Wichtigsten ?
+### Which are the most important one ?
 
   * MyISAM
-  * InnoDB (Default) 
+  * InnoDB
   * Memory
   * CSV
   * Blackhole (/dev/null)
   * Archive
-  * Federated
+  * Partition 
+  * (Federated)
 
 ### In Detail: MyISAM - Storage Engine
 
-```
-Feautures/Vorteile/Nachteile 
-
-Tabellen-Locks auf Tabellenebene.
-Kein automatisches Data-Recovery
-Daten z.B. bei Stromausfall können verloren (bis zu 8 Sekunden)
-Kein Transaktionen 
-Indizes werden im Arbeitsspeicher vorgehalten
-
-Vorteil: 
-Kompakte Datenspeicherung 
-Table Scans sind sehr schnell
-```
+   * table locks
+     * Locks are done table-wide
+   * no automatic data-recovery
+     * you can loose more data on crashes than with e.g. InnoDB
+     * you can loose up to 8 seconds of data 
+   * no transactions
+   * only indices are saved in memory through MySQL
+   * compact saving (data is saved really dense)
+   * table scans are quick
 
 ### In Detail: InnoDB - Storage Engine
 
-```
-Features
+#### Features
+    
+  * support hot backups (because of transactions)
+  * transactions are supported
+  * foreign keys are supported
+  * row-level locking
+  * multi-versioning
 
-Unterstützt hot backups (wg. Transaktionen)
-Transaktionen werden unterstüzt
-Foreign Keys werden unterstützt
-row-level locking
-multi-versioning
+### Internally 
 
-indexes referenzieren die Daten über Primärschlüssel 
-indexes can quickly get huge in size
-→ if size of primary index is not small
+  * indexes refer to the data through primary keys
+  * indexes can quickly get huge in size
+    * if size of primary index is not small
+  * InnoDB puts Data in Buffer Pool
+  * The Buffer Pool is in memory
 
-Sehr effektives Handling von Daten im Arbeitsspeicher 
-
-```
 
 ### Unterschiede MySQL 5.7 -> 8
 
@@ -199,52 +233,56 @@ Components/Komponenten sind neu in MySQL 8.
 
 ```
 
+### Ort Datenverzeichnis Windows
+
 ## Installation 
 
-### Installation (Ubuntu)
+### MySQL auf andere Platte installieren
 
 
-### Walkthrough
-
-```
-apt update
-apt install mysql-server 
-```
-
-### Secure installation 
+### Walkthrough 
 
 ```
-mysql_secure_installation 
+
+## 1. Download installer 
+
+## 2. Run Default installation to C: (with service) without installing service 
+
+## 3. Move installation directory to new destination (e.g. D:\
+
+## 4. Create new service with new destination (config-file) 
+## Erstellt den Service
+## Rechte muss stimmen / Rechte müssen gleich bleiben 
+mysqld.exe --install --defaults-file=D:\mymysqldir\my-defaults.cnf 
+
+## 5. service starten
+## oder unter Verwaltung 
+net start mysql 
+
+```
+
+
+
 ```
 
 ### Start/Status/Stop/Enable von MySQL
 
 
-### start/stop/status 
+### starten /stoppen 
 
 ```
-## als root - Benutzer
-systemctl status mysql
-systemctl stop mysql 
-systemctl start mysql 
-```
-
-### Aktivieren/Deaktivieren (enable/disable) 
+cmd.exe als Administratoren ausführen (Rechte Maustaste) 
+net start MySQL80 
+## stoppen 
+net stop MYSQL80 
 
 ```
-## Automatischen Starten nach dem Booten (enable) 
-systemctl enable mysql 
 
-## is dienst aktiviert 
-systemctl is-enabled mysql
+### Alternativ -> Dienste 
 
-## deaktivieren
-systemctl disable mysql 
-systemctl is-enabled mysql 
-
-## systemctl status -> Zeile disabled/enabled 
-
-
+```
+Dienste ->
+und in der Liste MySQL80 -> Rechte Maustaste
 ```
 
 ### Lauscht mysql nach draussen ?
@@ -258,14 +296,285 @@ lsof -i | grep mysql
 ## mysqld  5208           mysql   19u  IPv4  56942      0t0  TCP localhost:mysql (LISTEN)
 ```
 
+### 2. Instanz von MySQL erstellen
+
+
+### Walkthrough 
+
+```
+1. We stop MySQL 
+
+net stop MySQL80 
+
+2. Copy the Instance - Data 
+C:\ProgramData\MySQL\MySQL Server 8.0
+-> to e.g.
+C:\ProgramData\MySQL\MySQL-Instance-2 
+
+3. Change Permission 
+
+Add user "NETWORK SERVICE" with all permissions (beside special per permission) 
+
+4. Adjust my.ini in new folder MySQL-Instance-2 
+
+Adjust:
+## to new folder 
+datadir=  
+## port 
+## to new port (not 3306) - must be unused 
+
+5. Open cmd.exe as Administrator 
+
+## then cd to bin-folder of mysql 
+cd C:\Program Files\MySQL\MySQL Server 8.0\bin
+
+## install service 
+mysqld.exe --isntall mysql2 --defaults-file=C:\ProgramData\MySQL\MySQL-Instanz-2\my.ini 
+
+6. Go to service and refresh 
+
+7. Go to properties and change user to:
+
+NETWORK SERVICE 
+(clear password - lines and press o.k.)
+
+8. Start new service and be happy 
+
+```
+
+### Debugging 
+
+  * Is the path to binary correct in service 
+  * Is the defaults-file path correct in service 
+  * Is user NETWORK SERVICE added to new folder 
+  * Is datadir correct in new my.ini 
+  * Is port not same as in old my.ini 
+
+
+
 ## Konfiguration 
 
 ### Konfiguration anpassen und neu starten
+
+## Datenbank - Objekte 
+
+### Databases
+
+
+### Explanations 
+
+```
+## open a connection to the mysql-server by entering
+mysql
+## then you will get
+mysql> 
+```
+
+```
+## Comments within mysql-client
+## three - in a row 
+---
+```
+
+
+
+### Show databases
+
+```
+mysql
+mysql>
+;; from here i leave out mysql> 
+;; so you can easily copy & paste the lines hereafter 
+show databases 
+
+--
+-- or 
+--
+
+show schemas 
+
+--
+-- or by using information_schema 
+--
+
+select * from information_schema.schemata;
+```
+
+### Use a specific database 
+
+```
+## use specific database
+use sakila;
+
+
+
+### Create database 
+
+```
+create database training
+create schema training2
+```
+
+### Tables
+
+
+### Show tables 
+
+```
+## within mysql>
+## so on the command-line enter:
+## mysql (as root) 
+USE sakila 
+SHOW TABLES 
+
+-- or --
+
+select * from information_schema.TABLES 
+```
+
+#### Create table 
+
+```
+-- only if you want to create table in a completely new database 
+create schema training; 
+USE training
+CREATE TABLE people (id INT NOT NULL AUTO_INCREMENT, name VARCHAR(20), PRIMARY KEY(id)); 
+```
+
+#### Find out the structure of the table 
+
+```
+## you have to connect to db first with 
+## mysql 
+## within mysql>
+DESCRIBE people 
+SHOW CREATE TABLE people 
+-- or : if you want to know more --
+SELECT * from INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='people' AND TABLE_SCHEMA='training' \G
+```
+
+#### Show indexes 
+
+```
+SHOW INDEX FROM actor 
+SHOW INDEXES FROM ACTOR 
+```
+
+#### Change table (Add field)  
+
+```
+--- We want to add a field before name 
+--- IMPORTANT: BEFORE does not exist 
+ALTER TABLE people ADD first_name VARCHAR(10) AFTER id;
+
+ALTER TABLE schulungen ADD seats TINYINT unsigned DEFAULT 1, ADD price DECIMAL(6,2);
+ALTER TABLE schulungen ADD (room TINYINT unsigned DEFAULT 1,  discount DECIMAL(6,2));
+
+```
+
+#### Modify a field in table (Change property) 
+
+```
+ALTER TABLE people
+	MODIFY COLUMN first_name VARCHAR(20);
+```
+
+#### Drop a field from the table 
+
+```
+ALTER TABLE people ADD middle_name VARCHAR(25) BEFORE name; 
+DESCRIBE people;
+ALTER TABLE people DROP COLUMN middle_name;
+```  
+
+```
+## More Examples
+-- 
+ALTER TABLE actor ADD in_rente BOOLEAN default true 
+INSERT INTO actor (first_name,last_name,in_rente) values ('Jochen','Metzger',false)
+-- Wieder loswerden 
+ALTER TABLE actor DROP in_rente;
+## add and drop in once command 
+ALTER TABLE actor ADD in_rente2 BOOLEAN default true, DROP in_rente;
+```
+
+#### Deleting table data (truncate) 
+
+```
+USE sakila
+-- Create table based on other table 
+CREATE TABLE actorcopy as SELECT * FROM actor;
+-- Fields ? 
+SELECT * FROM actorcopy; 
+-- Empty it 
+TRUNCATE TABLE actorcopy; 
+-- Emptry ?
+SELECT COUNT(*) FROM actorcopy; 
+```
+
+#### Delete table data (with delete) 
+
+##### Explanation 
+
+  * Do not use delete when you want to use data of complete table
+    * truncate is quicker in this case.
+  * DELETE FROM ... WHERE ... does a SELECT first 
+  
+##### Example 
+
+```
+USE sakila
+CREATE TABLE actorbackup AS SELECT * FROM actor;
+SELECT COUNT(*) FROM actorbackup; 
+DELETE FROM actorbackup WHERE actor_id > 100; 
+SELECT COUNT(*) FROM actorbackup; 
+```
+
+#### Delete complete table 
+
+```
+USE sakila
+DROP TABLE actorbackup;
+```
+
+
+### Events
+
+  * https://www.mysqltutorial.org/mysql-triggers/working-mysql-scheduled-event/
+
+### Views
+
+
+### Walkthrough 
+
+```
+CREATE VIEW `avorname` AS
+    SELECT 
+        first_name AS vorname
+    FROM
+        actor;
+        
+        
+select * from avorname;
+
+## Abfrage 
+## das geht nicht -> weil view der Column nicht bekannt ist 
+select * from avorname where first_name like 'A%';
+
+## So muss es sein
+select * from avorname where vorname like 'A%';
+        
+        
+
+
+```
 
 ## Administration 
 
 ### Globale und Session Variablen (Server System Variables)
 
+
+### Find out with show and @@ 
 
 ```
 mysql> show session variables like 'PERFORMANCE%schema';
@@ -332,6 +641,58 @@ mysql> select @@GLOBAL.long_query_time;
 
 mysql> 
 
+
+```
+
+### SET PERSISTENT 
+
+```
+## Set variable to be use also after restart of mysql-server 
+SET PERSIST long_query_time = 0.000001
+
+## will we in 
+C:\ProgramData\MySQL\MySQL Server 8.0\Data\mysql-auto.cnf 
+## <- as json 
+## loaded after my.ini 
+```
+
+### Get GLOBAL/SESSION variable directly from performance_schema (starting from MySQL 8) 
+
+```
+use performance_schema 
+select * from global_variables;
+select * from session_variables 
+
+## or Alternative is (without use):
+use sakila;
+select * from performance_schema.global_variables
+select * from performance_schema.session_variables
+
+```
+
+### Global and Session Status
+
+
+### What for ? 
+
+```
+## Counts a number of values, like Com_select (how many selects)
+## - since the server runs:
+show global variables like 'Com_select';
+## - in session && since last flush in session 
+show variables like 'Com_select'
+
+
+```
+
+### flush status 
+
+```
+## flushes session status 
+## only values that are specific in session, like Com_select 
+show variables like 'Com_select';
+flush status;
+show variables like 'Com_select';
 
 ```
 
@@ -428,20 +789,72 @@ mysql> show session variables like 'long_query_time';
 1 row in set (0.00 sec)
 ```
 
+### MySQL - Client - Tools (most important)
+
+
+  * mysql (mysql-client) 
+  * mysqldump (backup of data)
+  * mysqlbinlog (read mysqlbinlog - files, because they are in binary format) 
+
+### Manage max_connections
+
+
+### Max Connections default 
+
+```
+select @@max_connections;
+```
+### Error like 
+
+```
+Too many connections 
+
+### increase or debug first by using status 
+show status like '%max%conn%';
+## Variable_name	Value
+Connection_errors_max_connections	16
+Max_used_connections	3
+Max_used_connections_time	2021-11-30 11:01:37
+
+
+
+```
+
+### Change in config 
+
+```
+## my.ini 
+[mysqld]
+## or even more 
+max_connections = 151 
+
+## restart server 
+net stop MySQL80 
+net start MySQL80 
+```
+
 ## Backup
 
 ### Backup mit mysqldump - best practices
 
 
-### Useful options for PIT 
+### Useful options for PIT (before MySQL 8.0.27)
 
 ```
 ## —quick not needed, because included in —opt which is enabled by default 
 
 ## on local systems using socket, there are no huge benefits concerning --compress
 ## when you dump over the network use it for sure 
-mysqldump --all-databases --single-transaction --gtid --master-data=2 --routines --events --flush-logs --compress > /usr/src/all-databases.sql;
+mysqldump -uroot -p --all-databases --single-transaction --master-data=2 --routines --events --flush-logs --compress > /usr/src/all-databases.sql;
 ```
+
+### Same, but MySQL >= 8.0.27 
+
+```
+mysqldump -uroot -p --all-databases --single-transaction --source-data=2 --routines --events --flush-logs --compress > /usr/src/all-databases.sql;
+
+```
+
 
 ### With PIT_Recovery you can use --delete-master-logs 
 
@@ -476,6 +889,13 @@ Mi 20. Jan 09:41:55 CET 2021
  mysqldump --tab=/backups contributions
  mysqldump --tab=/backups --master-data=2 contributions
  mysqldump --tab=/backups --master-data=2 contributions > /backups/master-data.tx
+```
+
+### mysqldump through the air 
+
+
+```
+mysqldump --all-databases --single-transaction --source-data=2 --routines --events --flush-logs --delete-source-logs -uroot -p | mysql -uroot -p --port=3308
 ```
 
 ### Backups PIT (Point-In-Time recovery)
@@ -519,108 +939,6 @@ mysql < /src/src/recovery.sql
 mysql> use sakila; select * from actor; 
 
 ```
-
-### Backup mit xtrabackup
-
-
-### Installation 
-
-```
-wget https://repo.percona.com/apt/percona-release_latest.$(lsb_release -sc)_all.deb
-## installationsquelle werden in /etc/apt/sources.list.d geschrieben 
-dpkg -i percona-release_latest.focal_all.deb 
-## neue installationsquellen einlesen
-apt update
-apt search xtrabackup
-apt install percona-xtrabackup-80 
-```
-
-### Walkthrough 
-
-```
-## server version differs to xtrabackup
-## xtrabackup 8.0.26 
-## mysql-server 8.0.27 
-
-xtrabackup --backup --target-dir /usr/src/backups/ --no-server-version-check
-xtrabackup --prepare --target-dir /usr/src/backups/ --no-server-version-check
-
-## altes datenverzeichnis aus dem Weg räumen 
-cd /var/lib 
-systemctl stop mysql
-mv mysql mysql.bkup 
-
-##
-xtrabackup --copy-back --target-dir /usr/src/backups/ --datadir=/var/lib/mysql --no-server-version-check
-## adjust permission
-chown -R mysql:mysql mysql 
-chmod -R g=,o= mysql 
-systemctl start mysql 
-```
-
-### Walkthrough 
-
-```
-## server version differs to xtrabackup
-## xtrabackup 8.0.26 
-## mysql-server 8.0.27 
-
-## important to check if installed 
-## and eventually install 
-apt search qpress
-apt install qpress 
-
-xtrabackup --backup --compress --target-dir /usr/src/backups/ --no-server-version-check
-xtrabackup --decompress --target-dir /usr/src/backups/ 
-xtrabackup --prepare --target-dir /usr/src/backups/ --no-server-version-check
-
-## altes datenverzeichnis aus dem Weg räumen 
-cd /var/lib 
-systemctl stop mysql
-mv mysql mysql.bkup 
-
-##
-xtrabackup --copy-back --target-dir /usr/src/backups/ --datadir=/var/lib/mysql --no-server-version-check
-## adjust permission
-chown -R mysql:mysql mysql 
-chmod -R g=,o= mysql 
-systemctl start mysql 
-```
-
-### Ref:
-
-  * https://www.percona.com/blog/2020/10/23/mysql-new-releases-and-percona-xtrabackup-incompatibilities/
-
-### Backup mit xtrabackup mit Verschlüsselung
-
-
-### Walkthrough 
-
-```
-## use output -> this key as encrypt-key 
-openssl rand -base64 24
-xtrabackup --backup --target-dir=/usr/src/backups-encrypted --encrypt=AES256 --encrypt-key="yIzl4skb1/Nn/t8g3cuEzpjGoYQQzo9l" --no-server-version-check 
-xtrabackup --decrypt=AES256 --encrypt-key="yIzl4skb1/Nn/t8g3cuEzpjGoYQQzo9l" --target-dir=/usr/src/backups-encrypted 
-xtrabackup --prepare --target-dir=/usr/src/backups-encrypted 
-
-##
-systemctl stop mysql
-cd /var/lib
-mv mysql mysql.bkup4
-## datadir needs to in config of /etc/mysql/ - folders (in one config with category [mysqld]
-xtrabackup --copy-back --target-dir=/usr/src/backups-encrypted  --no-server-version-check 
-cd /var/lib/
-chown -R mysql:mysql mysql
-chmod -R g=,o= mysql
-systemctl start mysql
-
-```
-
-
-### Refs:
-
-  * https://www.percona.com/doc/percona-xtrabackup/2.4/backup_scenarios/encrypted_backup.html
-  * https://www.percona.com/doc/percona-xtrabackup/LATEST/security/pxb-apparmor.html
 
 ### Backup und Wiederherstellen in neuer Datenbank
 
@@ -1179,12 +1497,41 @@ mysql < sakila-data.sql
 create user scanner@localhost identified with mysql_native_password by 'Passw0rd';
 ```
 
+### Wildcard-Rechte für Datenbank
+
+
+### Why ? 
+
+  * Allow a user to connect to all databases starting with prod_
+  * Also those, that are present yet .
+
+
+### Walktrough 
+
+```
+## as root 
+mysql> create user schulung@localhost identified by 'my_super_secret_pass';
+mysql> -- give permission to all databases starting with prod_
+mysql> grant all on `prod\_%`.* to schulung@localhost 
+mysql> create schema prod_db1; create schema prod_db2;
+mysql> use prod_db1; create table data (id int); 
+mysql> use prod_db2; create table data (id int);
+
+## as user schulung@localhost
+## connect and find out if you cann access db's 
+## mysql -uschulung -p 
+
+
+
+
+
+
 ### Rollen
 
 
 ### Konzept 
 
-  * Rolen 
+  * Rollen 
 
 ### Walkthrough  
 
@@ -1192,15 +1539,35 @@ create user scanner@localhost identified with mysql_native_password by 'Passw0rd
 ## Rolle anlegen 
 mysql> CREATE ROLE sakiladb 
 ## Berechtigungen der Rolle zuordnen / alle Berechtigungen für sakila 
-mysql> GRANT ALL ON sakila.db TO sakiladb 
+mysql> GRANT ALL ON sakila.* TO sakiladb 
 ## Nutzer anlegen 
 mysql> CREATE USER roleuser@localhost identified by 'P@ssw0rd';
 
 ## Die Rolle dem Nutzer zugeordnet 
-mysql> GRANT sakiladb TO rolesuser@localhost 
+mysql> GRANT sakiladb TO roleuser@localhost 
 
 ## Die Standardrolle festlegen, wenn er sich einloggt 
 SET DEFAULT ROLE ALL TO roleuser@localhost
+
+```
+
+### Weitere Rolle für den Nutzer 
+
+```
+CREATE ROLE mysqldb;
+GRANT ALL ON mysql.* TO mysqldb;
+GRANT mysqldb TO roleuser@localhost;
+
+### Important. SET DEFAULT ROLE must be executed once 
+### again to have mysqldb selected after login 
+SET DEFAULT ROLE ALL TO roleuser@localhost;
+
+```
+
+### Revoke a role from a user 
+
+```
+REVOKE mysqldb FROM roleuser@localhost;
 
 ```
 
@@ -1217,6 +1584,155 @@ create user roleuser2@localhost identified by 'P@ssw0rd' DEFAULT ROLE sakiladb;
   * https://www.mysqltutorial.org/mysql-roles/
 
 
+
+## Replication 
+
+### Overview
+
+
+![Overview Multi-Source-Replication](/images/multi-source-replication.jpg)
+
+### Multi-Source-Replication
+
+
+### Background 
+
+  * Aggregate multiple sources into one slave 
+  * Uses channels (FOR CHANNEL 'replicant-1')
+
+### Walkthrough 
+
+```
+-> ON master/replicant:
+
+## 1. create replication user 
+## event better IP-Range instead of % -> 192.168.56.% 
+CREATE USER repl_multi@'%' identified by 'your_secret_pass'
+GRANT REPLICATION SLAVE ON *.* TO 'repl_multi'@'%'
+
+## 2. test connection with that user 
+## in our case on same server 
+## explicitly host, because that's how we use it in CHANGE MASTER 
+mysql -urepl_multi -p -h127.0.0.1 
+
+## 3. Daten auf master ausspielen und master-data notieren 
+## CHANGE MASTER steht relativ am Anfang der Datei 
+mysqldump --all-databases --single-transaction --source-data=2 --routines --events --flush-logs --delete-source-logs -uroot -p > all-databases.sql
+
+-> ON slave/replica:
+
+## 1. be sure, that server does not have same server_id // server uuid 
+
+## --> Delete auto.cnf in datadir 
+
+## -> change server_id in my.cnf in [mysqld] section to > 1 
+## must be unique across all servers in master/slave replications network 
+## e.g. 
+server_id = 2 
+
+## 2. Restart server (in our case mysql2 is the replica) 
+net stop mysql2
+net start mysql2
+
+## 3. Import data into slave/replica from master 
+## port of our replica is 3308 
+mysql -uroot -p --port=3308 -h 127.0.0.1 < all-databases.sql 
+
+## 4. Construct change master -> sql command 
+## with master_pos, master_log_file from dump 
+## CHANGE MASTER is the same as CHANGE REPLICATION SOURCE 
+CHANGE REPLICATION SOURCE TO
+SOURCE_HOST='127.0.0.1',
+SOURCE_USER='repl_multi',
+SOURCE_PASSWORD='password',
+SOURCE_LOG_FILE='binlog.000026',
+SOURCE_LOG_POS=156
+FOR CHANNEL 'replicant-1';
+
+## 5. Check on slave if you succeeded
+show replica status; 
+## or 
+show slave status; 
+
+## look for slave_io_running -> YES  
+
+## look for slave_sql_running -> YES 
+
+## If not look for errors within the output 
+
+```
+
+
+### Show the state of replication in performance schema 
+
+```
+## all slaves 
+show slave status;
+
+## specific slave
+show slave status for channel 'replicant1';
+
+## more information in performance_schema 
+use performance_schema;
+select * from performance_schema.replication_connection_status \G
+```
+
+
+### Binlog format
+
+
+### What ? 
+
+```
+The binlog format determines how the data is written into the binary log 
+```
+
+### Which options ? 
+
+  * STATEMENT (first one in MySQL over development time)  
+  * ROW 
+  * MIXED
+
+### STATEMEMT
+
+  * The exact statement executed on replicant (master) will be written to binlog 
+
+### ROW 
+
+  * If you execute an update, it will not write the update itself but the results 
+  * Example: update last_name = 'Testuser' from sakila.actor where actor > 100 (200 dataset)  
+  * In binlog systems writes 100 dataset, each dataset with the exact data for that row 
+ 
+### MIXED 
+
+  * Systems decided if the sql was determenistic 
+  * If not -> uses row 
+  * if yes -> uses Statement 
+
+### DEFAULT 
+
+   * ROW (safest option) 
+
+### Change-Replication-Filter
+
+
+### Why ? 
+
+  * Allows to ignore db or only replicate specific db's 
+  * also possible: different for channel 
+
+### Example 
+
+```
+CHANGE REPLICATION FILTER REPLICATE_DO_DB = (d1) FOR CHANNEL channel_1;
+CHANGE REPLICATION FILTER REPLICATE_DO_DB = (d1);
+
+```
+
+
+### Reference 
+
+  * https://dev.mysql.com/doc/refman/8.0/en/change-replication-filter.html
 
 ## Upgrade 
 
@@ -1383,6 +1899,76 @@ Frage: Nimmt der installer diesen beider Installatio
   * https://www.netikus.net/documents/MySQLServerInstallation/index.html?moresecurity.htm
 
 
+
+## Tipps & Tricks 
+
+### Version von MySQL rausfinden
+
+
+```
+mysql> status;
+-- oder 
+mysql> select version()
+```
+
+### Show Information_schema within MySQL Workbench
+
+
+```
+Edit -> Preferences -> SQL Editor and then check the box "Show Metadata and Internal Schemas"
+```
+
+### Set path in Windows for User to easily use mysql
+
+
+```
+## Find path of binaries 
+## e.g. 
+C:\Program Files\MySQL\MySQL Server 8.0\bin
+
+## Now in Search - Field enter 
+Umgebungsvariablen 
+
+## Click on, Click Path and add new entry from above 
+
+```
+
+### Security with outfile mysql
+
+
+```
+## Generally, you can only write to a specific folder if secure_file_priv isset
+
+## Step1: Check setting in global server system variables 
+select @@secure_file_priv;
+## or 
+show variables like 'secure_file_priv';
+
+mysql> select @@secure_file_priv;
++------------------------------------------------+
+| @@secure_file_priv                             |
++------------------------------------------------+
+| C:\ProgramData\MySQL\MySQL Server 8.0\Uploads\ |
++------------------------------------------------+
+1 row in set (0.00 sec)
+
+## Step 2: than use exactly that path, but either with  '/' or '\\'
+## Version 1
+## Take whatever suffix you want ;o) 
+mysql>SELECT * from sakila.actor INTO OUTFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\actor.txt';
+## Version 2 
+mysql>SELECT * from sakila.actor INTO OUTFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/actor.txt';
+
+```
+
+### Alternative 
+
+```
+## -r raw format without table 
+## put -e expression in double quotes " 
+mysql -e "select * from actor;" -uroot -r -p sakila  > test.sql
+
+```
 
 ## Documentation 
 
