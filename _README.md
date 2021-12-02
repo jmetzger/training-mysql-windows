@@ -43,7 +43,6 @@
    
   1. Sicherheit
      * [Absichern von Server/Client mit ssl](#absichern-von-serverclient-mit-ssl)
-     * [Verschlüsselte Backups mit xtrabackup](#verschlüsselte-backups-mit-xtrabackup)
      * [Prüfen ob socket verwendet, bei lokalem System](#prüfen-ob-socket-verwendet,-bei-lokalem-system)
      * [mysql_secure_installation - validate plugin aktivieren](#mysql_secure_installation---validate-plugin-aktivieren)
      * [general log deaktivieren](#general-log-deaktivieren)
@@ -58,6 +57,9 @@
   1. Tools 
      * [Testdatenbank Sakila installieren](#testdatenbank-sakila-installieren)
 
+  1. Performance - Analyse 
+     * [Tool pt-query-digest](#tool-pt-query-digest)
+
   1. Authentifizierung / User-Management 
      * [Für User altes Password-Verfahren mysql_native_password verwenden in MySQL 8](#für-user-altes-password-verfahren-mysql_native_password-verwenden-in-mysql-8)
      * [Wildcard-Rechte für Datenbank](#wildcard-rechte-für-datenbank)
@@ -68,6 +70,7 @@
      * [Multi-Source-Replication](#multi-source-replication)
      * [Binlog format](#binlog-format)
      * [Change-Replication-Filter](#change-replication-filter)
+     * [What to do on error (sql-thread not running)](#what-to-do-on-error-sql-thread-not-running)
   
   1. Upgrade 
      * [Upgrade von MySQL 5.7 -> 8](#upgrade-von-mysql-5.7-->-8)
@@ -329,7 +332,7 @@ datadir=
 cd C:\Program Files\MySQL\MySQL Server 8.0\bin
 
 ## install service 
-mysqld.exe --isntall mysql2 --defaults-file=C:\ProgramData\MySQL\MySQL-Instanz-2\my.ini 
+mysqld.exe --install mysql2 --defaults-file=C:\ProgramData\MySQL\MySQL-Instanz-2\my.ini 
 
 6. Go to service and refresh 
 
@@ -1200,37 +1203,6 @@ mysql> status
 
   * https://dev.mysql.com/doc/refman/8.0/en/alter-user.html```
 
-### Verschlüsselte Backups mit xtrabackup
-
-
-### Walkthrough 
-
-```
-## use output -> this key as encrypt-key 
-openssl rand -base64 24
-xtrabackup --backup --target-dir=/usr/src/backups-encrypted --encrypt=AES256 --encrypt-key="yIzl4skb1/Nn/t8g3cuEzpjGoYQQzo9l" --no-server-version-check 
-xtrabackup --decrypt=AES256 --encrypt-key="yIzl4skb1/Nn/t8g3cuEzpjGoYQQzo9l" --target-dir=/usr/src/backups-encrypted 
-xtrabackup --prepare --target-dir=/usr/src/backups-encrypted 
-
-##
-systemctl stop mysql
-cd /var/lib
-mv mysql mysql.bkup4
-## datadir needs to in config of /etc/mysql/ - folders (in one config with category [mysqld]
-xtrabackup --copy-back --target-dir=/usr/src/backups-encrypted  --no-server-version-check 
-cd /var/lib/
-chown -R mysql:mysql mysql
-chmod -R g=,o= mysql
-systemctl start mysql
-
-```
-
-
-### Refs:
-
-  * https://www.percona.com/doc/percona-xtrabackup/2.4/backup_scenarios/encrypted_backup.html
-  * https://www.percona.com/doc/percona-xtrabackup/LATEST/security/pxb-apparmor.html
-
 ### Prüfen ob socket verwendet, bei lokalem System
 
 
@@ -1488,6 +1460,10 @@ mysql < sakila-data.sql
 
 ```
 
+## Performance - Analyse 
+
+### Tool pt-query-digest
+
 ## Authentifizierung / User-Management 
 
 ### Für User altes Password-Verfahren mysql_native_password verwenden in MySQL 8
@@ -1495,6 +1471,11 @@ mysql < sakila-data.sql
 
 ```
 create user scanner@localhost identified with mysql_native_password by 'Passw0rd';
+```
+
+```
+## even possible without changing password
+alter user training3@localhost identified with caching_sha2_password
 ```
 
 ### Wildcard-Rechte für Datenbank
@@ -1600,7 +1581,7 @@ create user roleuser2@localhost identified by 'P@ssw0rd' DEFAULT ROLE sakiladb;
   * Aggregate multiple sources into one slave 
   * Uses channels (FOR CHANNEL 'replicant-1')
 
-### Walkthrough 
+### Walkthrough (replicant-1)
 
 ```
 -> ON master/replicant:
@@ -1649,7 +1630,10 @@ SOURCE_LOG_FILE='binlog.000026',
 SOURCE_LOG_POS=156
 FOR CHANNEL 'replicant-1';
 
-## 5. Check on slave if you succeeded
+## 5. start replica 
+START REPLICA FOR CHANNEL 'replicant-1'
+
+## 6. Check on slave if you succeeded
 show replica status; 
 ## or 
 show slave status; 
@@ -1660,6 +1644,47 @@ show slave status;
 
 ## If not look for errors within the output 
 
+```
+### Walkthrough (replicant-2) 
+
+```
+1. neues Verzeicnnis erstellen
+2. richtige Rechte geben. -> NETWORK SERVICES
+Trainer08 IT-Schulungen11:19
+3. my.ini kopieren aus bisheriger Instanz 
+4. my.ini anpassen: port, datadir, server-id
+5. cmd.exe als Admin ausführen 
+6. in das bin -verzeichnis wechseln 
+cd C:\Program Files\MySQL\MySQL Server 8.0\bin
+7. Datenverzeichnis initial erstellen
+mysqld --defaults-file=C:\ProgramData\MySQL\MYSQL-basic\my.ini --initialize --console
+8. password kopieren / temporäres
+IXahAsElk4)V
+9. Service installieren
+10. mit Server verbinden (konsole) und password setzen
+mysql -uroot -p --port=3310
+mysql> alter user root@localhost identified by 'password'
+11. show master status;
+Daten notieren. 
+12. Replications-User einrichten 
+create user multi@'%' identified by 'password';
+grant slave replication on *.* to multi@'%';
+13. Test connection with multi user
+show grants
+
+14. On slave 
+CHANGE REPLICATION SOURCE TO
+SOURCE_HOST='127.0.0.1',
+SOURCE_USER='multi',
+SOURCE_PORT=3310,
+SOURCE_PASSWORD='password',
+SOURCE_LOG_FILE='binlog.000002',
+SOURCE_LOG_POS=10403
+FOR CHANNEL 'replicant-2';
+
+CHANGE REPLICATION FILTER REPLICATE_DO_DB = (dauerversuche) FOR CHANNEL 'replicant-2'START REPLICA FOR CHANNEL 'replicant-2';
+START REPLICA FOR CHANNEL 'replicant-2';
+SHOW REPLICA STATUS;
 ```
 
 
@@ -1724,15 +1749,90 @@ The binlog format determines how the data is written into the binary log
 ### Example 
 
 ```
-CHANGE REPLICATION FILTER REPLICATE_DO_DB = (d1) FOR CHANNEL channel_1;
+CHANGE REPLICATION FILTER REPLICATE_DO_DB = (dauertest) FOR CHANNEL replicant-1;
 CHANGE REPLICATION FILTER REPLICATE_DO_DB = (d1);
 
 ```
 
+### Start and Stop the slave (important) 
+
+```
+STOP REPLICA SQL_THREAD FOR CHANNEL 'replicant-1';
+CHANGE REPLICATION FILTER REPLICATE_DO_DB = (dauerversuche) FOR CHANNEL 'replicant-1';
+START REPLICA SQL_THREAD FOR CHANNEL 'replicant-1';
+```
+
+### Rausnehmen 
+
+```
+STOP REPLICA SQL_THREAD FOR CHANNEL 'replicant-1';
+CHANGE REPLICATION FILTER REPLICATE_DO_DB = () FOR CHANNEL 'replicant-1';
+START REPLICA SQL_THREAD FOR CHANNEL 'replicant-1';
+```
 
 ### Reference 
 
   * https://dev.mysql.com/doc/refman/8.0/en/change-replication-filter.html
+
+### What to do on error (sql-thread not running)
+
+
+### Situation 
+
+```
+## Auf dem slave/replica 
+show slave status;
+
+## Wir sehen 
+slave_sql_running -> no
+
+## And we will see an
+## and it show us at which place the error occured 
+## binlog -> and binlog_pos 
+Last_SQL_Error 
+```
+
+### Troubleshoot 
+
+```
+## We look into the binlog in the master for this channel 
+## and have a look what it did there 
+
+## cmd.exe
+## cd <data-directory>
+mysqlbinlog -vv bin-log.0000026 | more 
+
+## So now we look at the command which should have executed 
+## and also look, if the next would be o.k. 
+## Example 
+## Command 1: CREATE DATABASE dauertest 
+## .. but this database already exists on slave 
+## Command 2: SET GIT... would be o.k. 
+
+## Go back to slave 
+STOP SLAVE FOR CHANNEL 'your-channel' 
+## so we skip one binlog / relaylog -entry 
+SET GLOBAL sql_slave_skip_counter = 1 
+START SLAVE FOR CHANNEL 'your-channel' 
+
+## Doublecheck if it is running 
+SHOW REPLICA STATUS 
+
+## now -> should be
+## io_thread_running = YES  
+## sql_thread_running = YES 
+```
+
+### IMPORTANT 
+
+```
+If it struggles with the next error,
+DO NOT PROCEED LIKE so.
+But re-setup the slave 
+
+-> Because slave it completely messed up <--
+
+```
 
 ## Upgrade 
 
