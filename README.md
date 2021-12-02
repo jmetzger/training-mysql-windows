@@ -68,6 +68,7 @@
      * [Multi-Source-Replication](replication/multi-source-replication.md)
      * [Binlog format](replication/binlog_format.md)
      * [Change-Replication-Filter](replication/change-replication-filter.md)
+     * [What to do on error (sql-thread not running)](replication/what-do-to-on-error.md)
   
   1. Upgrade 
      * [Upgrade von MySQL 5.7 -> 8](upgrade/mysql-5-7-to-8.md)
