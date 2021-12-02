@@ -17,34 +17,22 @@ Free buffers       7905
 select @@innodb_buffer_pool_size;
 
 # how much does server use 
-show status like '%free%';
+show status like 'innodb%pages_free';
 
 ```
+
+```
+## my.ini oder 1M 
+innodb-buffer-pool-size = 1G
+# Server neu starten 
+net stop MySQL80
+net start MySQL 80
+```
+
 ## Overview innodb server variables / settings 
 
   * https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html
 
-## Change innodb_buffer_pool 
-
-```
-# /etc/mysql/mysql.conf.d/mysqld.cnf 
-# 70-80% of memory on dedicated mysql
-[mysqld]
-innodb-buffer-pool-size=6G
-
-#
-systemctl restart mysql
-
-# 
-mysql
-mysql>show variables like 'innodb%buffer%';
-```
-
-## innodb_flush_method 
-
-```
-Ideally O_DIRECT on Linux, but please test it, if it really works well. 
-```
 
 ## 	innodb_flush_log_at_trx_commit
 
