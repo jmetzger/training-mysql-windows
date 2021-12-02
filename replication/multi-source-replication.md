@@ -72,11 +72,31 @@ show slave status;
 ## Walkthrough (replicant-2) 
 
 ```
-# on replicant-2
-# which position for master binlog 
-SHOW MASTER STATUS;
+1. neues Verzeicnnis erstellen
+2. richtige Rechte geben. -> NETWORK SERVICES
+Trainer08 IT-Schulungen11:19
+3. my.ini kopieren aus bisheriger Instanz 
+4. my.ini anpassen: port, datadir, server-id
+5. cmd.exe als Admin ausführen 
+6. in das bin -verzeichnis wechseln 
+cd C:\Program Files\MySQL\MySQL Server 8.0\bin
+7. Datenverzeichnis initial erstellen
+mysqld --defaults-file=C:\ProgramData\MySQL\MYSQL-basic\my.ini --initialize --console
+8. password kopieren / temporäres
+IXahAsElk4)V
+9. Service installieren
+10. mit Server verbinden (konsole) und password setzen
+mysql -uroot -p --port=3310
+mysql> alter user root@localhost identified by 'password'
+11. show master status;
+Daten notieren. 
+12. Replications-User einrichten 
+create user multi@'%' identified by 'password';
+grant slave replication on *.* to multi@'%';
+13. Test connection with multi user
+show grants
 
-# on slave (Instanz 3) 
+14. On slave 
 CHANGE REPLICATION SOURCE TO
 SOURCE_HOST='127.0.0.1',
 SOURCE_USER='multi',
@@ -86,18 +106,11 @@ SOURCE_LOG_FILE='binlog.000002',
 SOURCE_LOG_POS=10403
 FOR CHANNEL 'replicant-2';
 
-#
 CHANGE REPLICATION FILTER REPLICATE_DO_DB = (dauerversuche) FOR CHANNEL 'replicant-2'START REPLICA FOR CHANNEL 'replicant-2';
-
-# 
-START REPLICA FOR CHANNEL 'replicant-2'
-
+START REPLICA FOR CHANNEL 'replicant-2';
 SHOW REPLICA STATUS;
-
 ```
 
-
-```
 
 ## Show the state of replication in performance schema 
 
