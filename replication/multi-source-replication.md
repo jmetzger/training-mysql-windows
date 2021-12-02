@@ -5,7 +5,7 @@
   * Aggregate multiple sources into one slave 
   * Uses channels (FOR CHANNEL 'replicant-1')
 
-## Walkthrough 
+## Walkthrough (replicant-1)
 
 ```
 -> ON master/replicant:
@@ -69,7 +69,35 @@ show slave status;
 # If not look for errors within the output 
 
 ```
+## Walkthrough (replicant-2) 
 
+```
+# on replicant-2
+# which position for master binlog 
+SHOW MASTER STATUS;
+
+# on slave (Instanz 3) 
+CHANGE REPLICATION SOURCE TO
+SOURCE_HOST='127.0.0.1',
+SOURCE_USER='multi',
+SOURCE_PORT=3310,
+SOURCE_PASSWORD='password',
+SOURCE_LOG_FILE='binlog.000002',
+SOURCE_LOG_POS=10403
+FOR CHANNEL 'replicant-2';
+
+#
+CHANGE REPLICATION FILTER REPLICATE_DO_DB = (dauerversuche) FOR CHANNEL 'replicant-2'START REPLICA FOR CHANNEL 'replicant-2';
+
+# 
+START REPLICA FOR CHANNEL 'replicant-2'
+
+SHOW REPLICA STATUS;
+
+```
+
+
+```
 
 ## Show the state of replication in performance schema 
 
