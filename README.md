@@ -65,6 +65,7 @@
 
   1. Replication 
      * [Binlog format](replication/binlog_format.md)
+     * [Change-Replication-Filter](replication/change-replication-filter.md)
   
   1. Upgrade 
      * [Upgrade von MySQL 5.7 -> 8](upgrade/mysql-5-7-to-8.md)
