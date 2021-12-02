@@ -30,7 +30,7 @@ datadir=
 cd C:\Program Files\MySQL\MySQL Server 8.0\bin
 
 # install service 
-mysqld.exe --isntall mysql2 --defaults-file=C:\ProgramData\MySQL\MySQL-Instanz-2\my.ini 
+mysqld.exe --install mysql2 --defaults-file=C:\ProgramData\MySQL\MySQL-Instanz-2\my.ini 
 
 6. Go to service and refresh 
 
