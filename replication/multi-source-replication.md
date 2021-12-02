@@ -54,7 +54,10 @@ SOURCE_LOG_FILE='binlog.000026',
 SOURCE_LOG_POS=156
 FOR CHANNEL 'replicant-1';
 
-# 5. Check on slave if you succeeded
+# 5. start replica 
+START REPLICA FOR CHANNEL 'replicant-1'
+
+# 6. Check on slave if you succeeded
 show replica status; 
 # or 
 show slave status; 
